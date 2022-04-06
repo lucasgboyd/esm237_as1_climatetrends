@@ -25,9 +25,7 @@ barrow <- read_csv(here("data", "barrow_ak.csv")) %>%
  What is it like? Urban/rural, polar/tropical, forest/desert, etc.
  What climate impacts might be important there?
  
-### 3. Assess whether climate at your location has been changing with trend analysis
-
-### AVERAGES
+### AVERAGES (Lucas)
 
 ```{r}
 
@@ -43,7 +41,7 @@ be relevant, given the climate change impacts you expect at this location?
 
 ```
 
-### EXTREMES
+### EXTREMES (Max)
 
 ```{r}
 
@@ -53,5 +51,9 @@ Refer to your answer for part 1 when choosing your metrics; why are these metric
 be relevant, given the climate change impacts you expect at this location?
 
 #### T, rank-sum, or other statistical tests
+
+```{r}
+
+```
 
 ### DISCUSSION
