@@ -7,7 +7,16 @@ output: html_document
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
+
+library(here)
+library(tidyverse)
+
 ```
+
+```{r}
+barrow_ak <- read_csv(here("data", "barrow_ak.csv"))
+```
+
 
 ### 1. Describe your chosen location.
  What is it like? Urban/rural, polar/tropical, forest/desert, etc.
