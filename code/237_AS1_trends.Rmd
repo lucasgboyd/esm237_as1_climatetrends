@@ -8,16 +8,16 @@ output:
     theme: spacelab
 ---
 
-![Willamette Falls, 2018. Credit: *Oregon Metro Council*](seattle.jpeg){width="100%"}
+![Seattle's downtown skyline. Credit: *Adam Romanowicz*](seattle.jpeg){width="100%"}
 
 # Overview {.tabset .tabset-pills}
 
- Describe the location: What is it like? Urban/rural, polar/tropical, forest/desert, etc.
- What climate impacts might be important there?
+Seattle is the largest city in Washington State. Situated between the Puget Sound and Lake Washington, Seattle is a largely urban area that is home to nearly 730,000 people. Known for its mild weather and persistent rain, Seattle's climate is temperate, which until recently has meant that it has avoided extreme temperature events, has abundant fresh water, and is famous for its lush green foliage. However, June of 2021 saw many of the hottest days in Seattle's history. Moreover, wildfires have become increasingly common in over the past decade. Together, these troubling trends raise questions about how Seattle's climate is changing and what adaptation measures should be implemented to adapt to these changes. The following report analyzes climate trends in Seattle using daily climate data from the National Climatic Data Center (NCDC). First, average climate variables relating to temperature and precipitation are explored to discover how Seattle's climate has changed from 1949 until today. Then, frequency and severity of climate extremes are examined.
  
-## Setup 
+## Setup
 
-### Packages
+![Wildfire smoke blankets the city. Credit: *Komo 4 News*](smoke.jpeg){width="100%"}
+
 ```{r setup, include=TRUE, message = FALSE, warning = FALSE}
 knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE)
 
@@ -34,7 +34,7 @@ library(kableExtra)
 library(broom)
 ```
 ### Data
-**Data Citation:** Climate Data Online (CDO). "National Climatic Data Center (NCDC).” Accessed April 8, 2022. https://www.ncdc.noaa.gov/cdo-web/datasets#GHCND.
+**Citation:** Climate Data Online (CDO). "National Climatic Data Center (NCDC).” Accessed April 8, 2022. https://www.ncdc.noaa.gov/cdo-web/datasets#GHCND.
 
 ```{r}
 seattle <- read_csv(here("data", "seattle.csv")) %>% 
@@ -144,7 +144,7 @@ seattle_monthly %>%
 
 ### Statistical Testing
 
-**Table 1** 
+**Table 1** displays the results of statistical testing performed on the climate trends data. Slope and P value refer to the results of simple linear regression. M-K significance level refers to the results of Mann-Kendall test performed on each measure. 
 ```{r}
 # linear regressions
 
@@ -191,28 +191,28 @@ mk_vector <- c(mkt1, mkt2, mkt3, mkt4)
 
 stats_table <- data.frame(lm_tidy_all_clean, mk_vector)
 
-stats_table_complete <- stats_table %>% 
-  mutate(mk_vector = case_when(
-    mk_vector < 0.0001 ~ "< 0.0001"))
-
-kable(stats_table, col.names = c("Measurement", "Slope", "P value", "M-K Significance Level"), digits = 4) %>% 
+kable(stats_table, 
+      col.names = c("Measurement", "Slope", "P value", "M-K Significance Level"), 
+      digits = c(0, 4, 4, 4)) %>% 
   kable_minimal(full_width = FALSE)
 ```
+
+#### Conclusions
+-  Average daily maximum temperature is increasing on average by 0.04 degrees F per year, and this trend was determined to be significant (p < 0.001).
+-  Average daily minimum temperature is also increasing, on average by 0.05 degrees F, and this trend was determined to be significant (p < 0.001).
+-  Thus temperatures both maximum and minimum daily average temperatures are increasing in the Seattle area. 
+-  There is not a significant trend in either monthly and annual precipitation, indicating that precipitation levels are not changing over time in Seattle. 
 
 
 ## Climate Extremes (Max)
 
-```{r}
 
-```
 
 Refer to your answer for part 1 when choosing your metrics; why are these metrics likely to
 be relevant, given the climate change impacts you expect at this location?
 
 ### T, rank-sum, or other statistical tests
 
-```{r}
 
-```
 
-## DISCUSSION
+## DISCUSSION (Max)
