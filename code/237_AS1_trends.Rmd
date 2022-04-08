@@ -2,22 +2,34 @@
 title: "Untitled"
 author: "Lucas Boyd"
 date: "4/5/2022"
-output: html_document
+output: 
+  html_document:
+    code_folding: hide
 ---
 
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+```{r setup, include=TRUE, message = FALSE, warning = FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE)
 
 library(here)
 library(tidyverse)
 library(janitor)
-
+library(lubridate)
+library(tsibble)
+library(feasts)
+library(gghighlight)
+library(plotly)
+library(Kendall)
+library(kableExtra)
+library(broom)
 ```
 
 ```{r}
-barrow <- read_csv(here("data", "barrow_ak.csv")) %>% 
+seattle <- read_csv(here("data", "seattle.csv")) %>% 
   clean_names() %>% 
-  select(-station, -name, -starts_with("wt"))
+  select(-station, -name, -starts_with("wt")) %>% 
+  mutate(month = month(date, label = TRUE)) %>% 
+  mutate(year = year(date)) %>% 
+  drop_na(tmax, tmin, prcp)
 ```
 
 
@@ -28,9 +40,148 @@ barrow <- read_csv(here("data", "barrow_ak.csv")) %>%
 ### AVERAGES (Lucas)
 
 ```{r}
+# data wrangling
+
+# converting the dataframe to a time series
+seattle_ts <- seattle %>% 
+  as_tsibble(key = NULL, index = date) 
+
+# monthly 
+seattle_monthly <- seattle_ts %>% 
+  index_by(year_month = ~yearmonth(.)) %>% 
+  summarize(mean_daily_max_temp = mean(tmax, na.rm = TRUE), 
+            mean_daily_min_temp = mean(tmin, na.rm = TRUE), 
+            mean_daily_precip = mean(prcp, na.rm = TRUE), 
+            max_temp_monthly = max(tmax, na.rm = TRUE), 
+            min_temp_monthly = min(tmin, na.rm = TRUE),
+            monthly_precip = sum(prcp, na.rm = TRUE)) %>% 
+  mutate(year = year(year_month))
+
+# yearly
+seattle_yearly <- seattle_ts %>% 
+  index_by(year) %>% 
+  summarize(mean_daily_max_temp = mean(tmax, na.rm = TRUE), 
+            mean_daily_min_temp = mean(tmin, na.rm = TRUE), 
+            mean_daily_precip = mean(prcp, na.rm = TRUE),
+            total_yearly_precip = sum(prcp)) %>% 
+  filter(year != "2022") %>% 
+  filter(year != "1948")
+
+# hottest 10 years on record
+seattle_hottest <- seattle_yearly %>% 
+  slice_max(n = 10, order_by = mean_daily_max_temp)
 
 ```
+### Temperature
+```{r}
+# smooth yearly ggplot
+ggplot(data = seattle_yearly) +
+  geom_smooth(method = "lm", 
+              color = "gray25", 
+              aes(x = year, 
+                  y = mean_daily_max_temp)) +
+  geom_smooth(method = "lm", 
+              color = "gray25", 
+              aes(x = year, 
+                  y = mean_daily_min_temp)) +
+geom_point(aes(x = year, 
+               y = mean_daily_max_temp, 
+               color = mean_daily_max_temp), 
+           size = 2) +
+  geom_point(aes(x = year, 
+                 y = mean_daily_min_temp, 
+                 color = mean_daily_min_temp), 
+             size = 2) +
+  scale_color_gradientn(colors = c("deepskyblue4", "firebrick")) +
+  theme_minimal(14) +
+  theme(legend.position = "none") +
+  labs(x = element_blank(), 
+       y = "Average Daily Temperature (F)")
+```
 
+#### Statistical Testing
+
+```{r}
+# linear regressions
+
+# max temp
+temp_max_lm <- lm(mean_daily_max_temp ~ year, data = seattle_yearly)
+temp_max_tidy <- tidy(temp_max_lm)
+
+# min temp
+temp_min_lm <- lm(mean_daily_min_temp ~ year, data = seattle_yearly)
+temp_min_tidy <- tidy(temp_min_lm)
+
+# annual precip
+yearly_precip_lm <- lm(total_yearly_precip ~ year, data = seattle_yearly)
+yearly_precip_tidy <- tidy(yearly_precip_lm)
+
+# monthly precip
+monthly_precip_lm <- lm(monthly_precip ~ year, data = seattle_monthly)
+monthly_precip_tidy <- tidy(monthly_precip_lm)
+
+lm_tidy_all <- rbind(temp_max_tidy, 
+                     temp_min_tidy, 
+                     yearly_precip_tidy,
+                     monthly_precip_tidy)
+lm_tidy_all_coef <- lm_tidy_all %>% 
+  filter(term == "year") %>% 
+  select(-statistic, -std.error, -term)
+         
+names_vector <- c("Average Maximum Daily Temperature (F)", "Average Minimum Daily Temperature (F)", "Annual Precipitation (inches)", "Monthly Precipitation (inches)")
+
+lm_tidy_all_clean <- data.frame(names_vector, lm_tidy_all_coef)
+
+
+# Mann Kendall
+mk1 <- MannKendall(seattle_yearly$mean_daily_max_temp)
+mkt1 <- mk1$sl
+mk2 <- MannKendall(seattle_yearly$mean_daily_min_temp)
+mkt2 <- mk2$sl
+mk3 <- MannKendall(seattle_yearly$total_yearly_precip)
+mkt3 <- mk3$sl
+mk4 <- MannKendall(seattle_monthly$monthly_precip)
+mkt4 <- mk4$sl
+
+mk_vector <- c(mkt1, mkt2, mkt3, mkt4)
+
+stats_table <- data.frame(lm_tidy_all_clean, mk_vector)
+
+stats_table_complete <- stats_table %>% 
+  mutate(mk_vector = case_when(
+    mk_vector < 0.0001 ~ "< 0.0001"))
+
+kable(stats_table, col.names = c("Measurement", "Slope", "P value", "MK Significance Level"), digits = 4) %>% 
+  kable_minimal()
+```
+
+#### Seasonplot
+
+```{r}
+# temp season plot
+seattle_monthly %>% 
+  gg_season(y = mean_daily_max_temp) +
+  gghighlight(year %in% c("2021", "2020")) +
+  theme_minimal(14) +
+  labs(x = "Month", 
+       y = "Average Daily Temperature (F)")
+```
+
+
+### Precipitation
+```{r}
+ggplot(data = seattle_yearly, aes(x = year, y = total_yearly_precip)) +
+  geom_smooth(method = "lm", color = "deepskyblue4") +
+  geom_point() +
+  theme_minimal(14) +
+  labs(x = element_blank(), y = "Total Annual Precipitation (inches)")
+
+seattle_monthly %>% 
+  gg_season(y = monthly_precip) +
+  gghighlight(year %in% c("2021", "2020")) +
+  theme_minimal(14) +
+  labs(x = element_blank(), y = "Monthly Precipitation (inches)")
+```
 
 Refer to your answer for part 1 when choosing your metrics; why are these metrics likely to
 be relevant, given the climate change impacts you expect at this location?
