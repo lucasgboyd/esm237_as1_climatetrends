@@ -1,12 +1,23 @@
 ---
-title: "Untitled"
+title: "Climate Trends: Seattle, Washington"
 author: "Lucas Boyd"
 date: "4/5/2022"
 output: 
   html_document:
     code_folding: hide
+    theme: spacelab
 ---
 
+![Willamette Falls, 2018. Credit: *Oregon Metro Council*](seattle.jpeg){width="100%"}
+
+# Overview {.tabset .tabset-pills}
+
+ Describe the location: What is it like? Urban/rural, polar/tropical, forest/desert, etc.
+ What climate impacts might be important there?
+ 
+## Setup 
+
+### Packages
 ```{r setup, include=TRUE, message = FALSE, warning = FALSE}
 knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE)
 
@@ -22,6 +33,8 @@ library(Kendall)
 library(kableExtra)
 library(broom)
 ```
+### Data
+**Data Citation:** Climate Data Online (CDO). "National Climatic Data Center (NCDC).” Accessed April 8, 2022. https://www.ncdc.noaa.gov/cdo-web/datasets#GHCND.
 
 ```{r}
 seattle <- read_csv(here("data", "seattle.csv")) %>% 
@@ -31,13 +44,8 @@ seattle <- read_csv(here("data", "seattle.csv")) %>%
   mutate(year = year(date)) %>% 
   drop_na(tmax, tmin, prcp)
 ```
-
-
-### 1. Describe your chosen location.
- What is it like? Urban/rural, polar/tropical, forest/desert, etc.
- What climate impacts might be important there?
  
-### AVERAGES (Lucas)
+## Climate Averages
 
 ```{r}
 # data wrangling
@@ -99,8 +107,44 @@ geom_point(aes(x = year,
        y = "Average Daily Temperature (F)")
 ```
 
-#### Statistical Testing
+**Figure 1** shows Seattle's average daily maximum temperature (red) and average daily minimum temperature (blue) by year. Trendline was fitted using simple linear regression. Grey shading represents the bounds of a 95% confidence interval. 
 
+```{r}
+# seasonplot
+seattle_monthly %>% 
+  gg_season(y = mean_daily_max_temp) +
+  gghighlight(year %in% c("2021", "2020")) +
+  theme_minimal(14) +
+  labs(x = "Month", 
+       y = "Average Daily Temperature (F)")
+```
+
+**Figure 2** shows seasonal variation in daily maximum temperature across from 1949-2021. Each grey line represents a year since 1949. The past two years are highlighted for reference. 
+
+### Precipitation
+```{r}
+ggplot(data = seattle_yearly, aes(x = year, y = total_yearly_precip)) +
+  geom_smooth(method = "lm", color = "deepskyblue4") +
+  geom_point() +
+  theme_minimal(14) +
+  labs(x = element_blank(), y = "Total Annual Precipitation (inches)")
+```
+
+**Figure 3** shows Seattle's annual precipitation (inches) since 1949. Trendline was fitted using simple linear regression. Grey shading represents the bounds of a 95% confidence interval. 
+
+```{r}
+seattle_monthly %>% 
+  gg_season(y = monthly_precip) +
+  gghighlight(year %in% c("2021", "2020")) +
+  theme_minimal(14) +
+  labs(x = element_blank(), y = "Monthly Precipitation (inches)")
+```
+
+**Figure 4** shows seasonal variation in monthly precipitation totals. Each grey line represents a year from 1949-2021. The past two years are highlighted for reference. 
+
+### Statistical Testing
+
+**Table 1** 
 ```{r}
 # linear regressions
 
@@ -151,48 +195,12 @@ stats_table_complete <- stats_table %>%
   mutate(mk_vector = case_when(
     mk_vector < 0.0001 ~ "< 0.0001"))
 
-kable(stats_table, col.names = c("Measurement", "Slope", "P value", "MK Significance Level"), digits = 4) %>% 
-  kable_minimal()
-```
-
-#### Seasonplot
-
-```{r}
-# temp season plot
-seattle_monthly %>% 
-  gg_season(y = mean_daily_max_temp) +
-  gghighlight(year %in% c("2021", "2020")) +
-  theme_minimal(14) +
-  labs(x = "Month", 
-       y = "Average Daily Temperature (F)")
+kable(stats_table, col.names = c("Measurement", "Slope", "P value", "M-K Significance Level"), digits = 4) %>% 
+  kable_minimal(full_width = FALSE)
 ```
 
 
-### Precipitation
-```{r}
-ggplot(data = seattle_yearly, aes(x = year, y = total_yearly_precip)) +
-  geom_smooth(method = "lm", color = "deepskyblue4") +
-  geom_point() +
-  theme_minimal(14) +
-  labs(x = element_blank(), y = "Total Annual Precipitation (inches)")
-
-seattle_monthly %>% 
-  gg_season(y = monthly_precip) +
-  gghighlight(year %in% c("2021", "2020")) +
-  theme_minimal(14) +
-  labs(x = element_blank(), y = "Monthly Precipitation (inches)")
-```
-
-Refer to your answer for part 1 when choosing your metrics; why are these metrics likely to
-be relevant, given the climate change impacts you expect at this location?
-
-#### T, rank-sum, or other statistical tests
-
-```{r}
-
-```
-
-### EXTREMES (Max)
+## Climate Extremes (Max)
 
 ```{r}
 
@@ -201,10 +209,10 @@ be relevant, given the climate change impacts you expect at this location?
 Refer to your answer for part 1 when choosing your metrics; why are these metrics likely to
 be relevant, given the climate change impacts you expect at this location?
 
-#### T, rank-sum, or other statistical tests
+### T, rank-sum, or other statistical tests
 
 ```{r}
 
 ```
 
-### DISCUSSION
+## DISCUSSION
