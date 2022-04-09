@@ -234,6 +234,25 @@ seattle_below_freezing <- seattle_ts %>%
   filter(year != "1948")
 ```
 
+```{r}
+# precip extremes
+
+# days with over an inch of precipitation
+seattle_wet_days <- seattle_ts %>% 
+  index_by(year) %>% 
+  summarize(wet_days = sum(ifelse(prcp >= 1, 1, 0))) %>% 
+  filter(year != "2022") %>% 
+  filter(year != "1948")
+
+# days with no precipitation
+seattle_dry_days <- seattle_ts %>% 
+  index_by(year) %>% 
+  summarize(dry_days = sum(ifelse(prcp < 0.1, 1, 0))) %>% 
+  filter(year != "2022") %>% 
+  filter(year != "1948")
+
+```
+
 
 Refer to your answer for part 1 when choosing your metrics; why are these metrics likely to
 be relevant, given the climate change impacts you expect at this location?
