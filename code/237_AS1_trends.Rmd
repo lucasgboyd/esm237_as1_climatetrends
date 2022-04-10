@@ -244,7 +244,7 @@ seattle_below_freezing <- seattle_ts %>%
 # precipitation extremes
 
 # days with over an inch of precipitation
-seattle_wet_days <- seattle_ts %>% 
+seattle_wet_dry_days <- seattle_ts %>% 
   index_by(year) %>% 
   summarize(wet_days = sum(ifelse(prcp >= 1, 1, 0))) %>% 
   filter(year != "2022") %>% 
@@ -316,6 +316,35 @@ geom_point(aes(x = year,
 
 ### Precipitation Extremes
 
+```{r}
+ggplot(data = seattle_wet_days) +
+  geom_smooth(method = "lm", 
+              color = "gray25", 
+              aes(x = year, 
+                  y = wet_days)) +
+  geom_point(aes(x = year, 
+               y = wet_days, 
+               color = wet_days), 
+           size = 2) +
+  theme_minimal(14) +
+  theme(legend.position = "none") +
+  labs(x = element_blank(), 
+       y = "Number of Days with over 1 Inch of Precipitation")
+
+ggplot(data = seattle_dry_days) +
+  geom_smooth(method = "lm", 
+              color = "gray25", 
+              aes(x = year, 
+                  y = dry_days)) +
+  geom_point(aes(x = year, 
+               y = dry_days, 
+               color = dry_days), 
+           size = 2) +
+  theme_minimal(14) +
+  theme(legend.position = "none") +
+  labs(x = element_blank(), 
+       y = "Number of Days with No Precipitation")
+```
 
 
 Refer to your answer for part 1 when choosing your metrics; why are these metrics likely to
