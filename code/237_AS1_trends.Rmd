@@ -13,7 +13,7 @@ output:
 # Overview {.tabset .tabset-pills}
 
 Seattle is the largest city in Washington State. Situated between the Puget Sound and Lake Washington, it is a largely urban area that is home to nearly 730,000 people. Known for its mild weather and persistent rain, Seattle's climate is temperate, which until recently has meant that it has avoided extreme temperature events, has abundant fresh water, and is famous for its lush green foliage. However, June of 2021 saw many of the hottest days in Seattle's history. Moreover, wildfires have become increasingly common in over the past decade. Together, these troubling trends raise questions about how Seattle's climate is changing and what adaptation measures should be implemented to adapt to these changes. The following report analyzes climate trends in Seattle using daily climate data from the National Climatic Data Center (NCDC). First, average climate variables relating to temperature and precipitation are explored to discover how Seattle's climate has changed from 1949 until today. Then, frequency and severity of climate extremes are examined.
- 
+
 ## Setup
 
 ![Wildfire smoke blankets the city. Credit: *Komo 4 News*](smoke.jpeg){width="100%"}
@@ -33,8 +33,10 @@ library(Kendall)
 library(kableExtra)
 library(broom)
 ```
+
 ### Data
-**Citation:** Climate Data Online (CDO). "National Climatic Data Center (NCDC).” Accessed April 8, 2022. https://www.ncdc.noaa.gov/cdo-web/datasets#GHCND.
+
+**Citation:** Climate Data Online (CDO). "National Climatic Data Center (NCDC)." Accessed April 8, 2022. <https://www.ncdc.noaa.gov/cdo-web/datasets#GHCND>.
 
 ```{r}
 seattle <- read_csv(here("data", "seattle.csv")) %>% 
@@ -44,7 +46,7 @@ seattle <- read_csv(here("data", "seattle.csv")) %>%
   mutate(year = year(date)) %>% 
   drop_na(tmax, tmin, prcp)
 ```
- 
+
 ## Climate Averages
 
 ```{r}
@@ -80,7 +82,9 @@ seattle_hottest <- seattle_yearly %>%
   slice_max(n = 10, order_by = mean_daily_max_temp)
 
 ```
+
 ### Temperature
+
 ```{r}
 # smooth yearly ggplot
 ggplot(data = seattle_yearly) +
@@ -109,7 +113,7 @@ geom_point(aes(x = year,
   geom_text(x = 2010, y = 43, label = "Daily Min", color = "deepskyblue4", size = 7)
 ```
 
-**Figure 1** shows Seattle's average daily maximum temperature (red) and average daily minimum temperature (blue) by year. Trendline was fitted using simple linear regression. Grey shading represents the bounds of a 95% confidence interval. 
+**Figure 1** shows Seattle's average daily maximum temperature (red) and average daily minimum temperature (blue) by year. Trendline was fitted using simple linear regression. Grey shading represents the bounds of a 95% confidence interval.
 
 ```{r}
 # seasonplot
@@ -121,9 +125,10 @@ seattle_monthly %>%
        y = "Average Daily Temperature (F)")
 ```
 
-**Figure 2** shows seasonal variation in daily maximum temperature across from 1949-2021. Each grey line represents a year since 1949. The past two years are highlighted for reference. 
+**Figure 2** shows seasonal variation in daily maximum temperature across from 1949-2021. Each grey line represents a year since 1949. The past two years are highlighted for reference.
 
 ### Precipitation
+
 ```{r}
 ggplot(data = seattle_yearly, aes(x = year, y = total_yearly_precip)) +
   geom_smooth(method = "lm", color = "deepskyblue4") +
@@ -132,7 +137,7 @@ ggplot(data = seattle_yearly, aes(x = year, y = total_yearly_precip)) +
   labs(x = element_blank(), y = "Total Annual Precipitation (inches)")
 ```
 
-**Figure 3** shows Seattle's annual precipitation (inches) since 1949. Trendline was fitted using simple linear regression. Grey shading represents the bounds of a 95% confidence interval. 
+**Figure 3** shows Seattle's annual precipitation (inches) since 1949. Trendline was fitted using simple linear regression. Grey shading represents the bounds of a 95% confidence interval.
 
 ```{r}
 seattle_monthly %>% 
@@ -142,11 +147,12 @@ seattle_monthly %>%
   labs(x = element_blank(), y = "Monthly Precipitation (inches)")
 ```
 
-**Figure 4** shows seasonal variation in monthly precipitation totals. Each grey line represents a year from 1949-2021. The past two years are highlighted for reference. 
+**Figure 4** shows seasonal variation in monthly precipitation totals. Each grey line represents a year from 1949-2021. The past two years are highlighted for reference.
 
 ### Statistical Testing
 
-**Table 1** displays the results of statistical testing performed on the climate trends data. Slope and P value refer to the results of simple linear regression. M-K significance level refers to the results of Mann-Kendall test performed on each measure. 
+**Table 1** displays the results of statistical testing performed on the climate trends data. Slope and P value refer to the results of simple linear regression. M-K significance level refers to the results of Mann-Kendall test performed on each measure.
+
 ```{r}
 # linear regressions
 
@@ -199,13 +205,12 @@ kable(stats_table,
   kable_minimal(full_width = FALSE)
 ```
 
-
-
 #### Conclusions
--  Average daily maximum temperature is increasing on average by 0.04 degrees F per year, and this trend was determined to be significant (p < 0.001).
--  Average daily minimum temperature is also increasing, on average by 0.05 degrees F, and this trend was determined to be significant (p < 0.001).
--  Thus temperatures both maximum and minimum daily average temperatures are increasing in the Seattle area. 
--  There is not a significant trend in either monthly and annual precipitation, indicating that precipitation levels are not changing over time in Seattle. 
+
+-   **Average daily maximum temperature is increasing on average by 0.04 degrees F per year**, and this trend was determined to be significant (p \< 0.001).
+-   **Average daily minimum temperature is also increasing, on average by 0.05 degrees F**, and this trend was determined to be significant (p \< 0.001).
+-   Thus temperatures both maximum and minimum daily average temperatures are increasing in the Seattle area.
+-   T**here is not a significant trend in either monthly and annual precipitation**, indicating that precipitation levels are not changing over time in Seattle.
 
 $$\\[.5in]$$
 
@@ -244,7 +249,7 @@ seattle_below_freezing <- seattle_ts %>%
 # precipitation extremes
 
 # days with over an inch of precipitation
-seattle_wet_dry_days <- seattle_ts %>% 
+seattle_wet_days <- seattle_ts %>% 
   index_by(year) %>% 
   summarize(wet_days = sum(ifelse(prcp >= 1, 1, 0))) %>% 
   filter(year != "2022") %>% 
@@ -313,7 +318,6 @@ geom_point(aes(x = year,
        y = "Number of Nights Below Freezing")
 ```
 
-
 ### Precipitation Extremes
 
 ```{r}
@@ -346,12 +350,8 @@ ggplot(data = seattle_dry_days) +
        y = "Number of Days with No Precipitation")
 ```
 
-
-Refer to your answer for part 1 when choosing your metrics; why are these metrics likely to
-be relevant, given the climate change impacts you expect at this location?
+Refer to your answer for part 1 when choosing your metrics; why are these metrics likely to be relevant, given the climate change impacts you expect at this location?
 
 ### T, rank-sum, or other statistical tests
-
-
 
 ## Discussion
