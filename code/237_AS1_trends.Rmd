@@ -367,8 +367,59 @@ ggplot(data = seattle_dry_days) +
 **Figure 8** shows the number of dry days in Seattle per year, respresented by days where there was no measured precipitation. The trendline was fitted using simple linear regression. Grey shading represents the bounds of a 95% confidence interval.
 
 
-### Statistical Analysis
+### Statistical Testing
 
+```{r}
+# linear regressions
+
+# hot days
+hot_days_lm <- lm(days_above_85 ~ year, data = seattle_hot_days)
+hot_days_tidy <- tidy(hot_days_lm)
+
+# freezing days
+freezing_days_lm <- lm(days_below_freezing ~ year, data = seattle_below_freezing)
+freezing_days_tidy <- tidy(temp_min_lm)
+
+# wet days
+wet_days_lm <- lm(wet_days ~ year, data = seattle_wet_days)
+wet_days_tidy <- tidy(wet_days_lm)
+
+# dry days
+dry_days_lm <- lm(dry_days ~ year, data = seattle_dry_days)
+dry_days_tidy <- tidy(dry_days_lm)
+
+lm_tidy_extremes <- rbind(hot_days_tidy, 
+                     freezing_days_tidy, 
+                     wet_days_tidy,
+                     dry_days_tidy)
+lm_tidy_extremes_coef <- lm_tidy_extremes %>% 
+  filter(term == "year") %>% 
+  select(-statistic, -std.error, -term)
+         
+extremes_names_vector <- c("Days Per Year Above 85 Degrees (F)", "Days Per Year Below Freezing", "Number of Days with over 1 Inch of Precipitation", "Number of Days with No Precipitation")
+
+lm_tidy_extremes_clean <- data.frame(extremes_names_vector, lm_tidy_extremes_coef)
+
+
+# Mann Kendall testing for significance
+mk_hot_days <- MannKendall(seattle_hot_days$days_above_85)
+mkt_hot_days <- mk_hot_days$sl
+mk_freezing_days <- MannKendall(seattle_below_freezing$days_below_freezing)
+mkt_freezing_days <- mk_freezing_days$sl
+mk_wet_days <- MannKendall(seattle_wet_days$wet_days)
+mkt_wet_days <- mk_wet_days$sl
+mk_dry_days <- MannKendall(seattle_dry_days$dry_days)
+mkt_dry_days <- mk_dry_days$sl
+
+mk_extremes_vector <- c(mkt_hot_days, mkt_freezing_days, mkt_wet_days, mkt_dry_days)
+
+extremes_stats_table <- data.frame(lm_tidy_extremes_clean, mk_extremes_vector)
+
+kable(extremes_stats_table, 
+      col.names = c("Measurement", "Slope", "P value", "M-K Significance Level"), 
+      digits = c(0, 4, 4, 4)) %>% 
+  kable_minimal(full_width = FALSE)
+```
 
 
 ## Discussion
