@@ -283,6 +283,7 @@ geom_point(aes(x = year,
   labs(x = element_blank(), 
        y = "Hottest Day of the Year (F)")
 ```
+
 ```{r}
 # plotting number of days over 85 
 
