@@ -431,4 +431,10 @@ kable(extremes_stats_table,
 
 ## Discussion
 
+The analyses conducted in this report show that average maximum and minimum temperatures are increasing over time; and that extreme heat events are increasing in frequency while extreme cold events are decreasing. While these trends in temperature were found to be significant, no significant changes in precipitation trends or extremes were observed. These results indicate that Seattle will need to adapt to increasing temperatures and extreme heat events as global temperatures rise due to climate change. 
+
+To assess changes in Seattle’s climate, climate averages were examined using average maximum daily temperature (F), average minimum daily temperature (F), annual precipitation (inches), and monthly precipitation (inches) as metrics. Climate extremes were examined using days per year above 85 degrees (F), days per year below freezing, the number of wet days per year (over 1 inch of precipitation), and the number of dry days per year (no precipitation recorded). Metrics for temperature were chosen since Seattle experienced record breaking heat during 2021, and we felt it was important to look at trends in temperature outside of this singular heat wave. Metrics for precipitation were also selected since Seattle is known for its rainfall, and we wanted to observe whether potential changes in average/extreme heat also occurred with changes in precipitation. 
+
+The conclusions from this analysis suggest that Seattle should prepare for warmer average temperatures and more frequent heat waves. The city may want to consider adaptation measures that can reduce urban heat island effects such as high albedo rooftops, cool pavements, and an increase of tree cover and vegetation. However, careful research and planning should accompany these investments as seemingly beneficial adaptation practices such as increasing tree cover have been shown to increase gentrification, raising equity concerns. 
+
 
