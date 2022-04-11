@@ -210,7 +210,7 @@ kable(stats_table,
 -   **Average daily maximum temperature is increasing on average by 0.04 degrees F per year**, and this trend was determined to be significant (p \< 0.001).
 -   **Average daily minimum temperature is also increasing, on average by 0.05 degrees F**, and this trend was determined to be significant (p \< 0.001).
 -   Thus temperatures both maximum and minimum daily average temperatures are increasing in the Seattle area.
--   T**here is not a significant trend in either monthly and annual precipitation**, indicating that precipitation levels are not changing over time in Seattle.
+-   **There is not a significant trend in either monthly and annual precipitation**, indicating that precipitation levels are not changing over time in Seattle.
 
 $$\\[.5in]$$
 
@@ -343,7 +343,7 @@ ggplot(data = seattle_wet_days) +
   theme_minimal(14) +
   theme(legend.position = "none") +
   labs(x = element_blank(), 
-       y = "Number of Days with over 1 Inch of Precipitation")
+       y = "Number of Days with over 1 In of Precipitation")
 ```
 
 **Figure 7** shows the number of wet days in Seattle per year, determined by days with at least 1 inch of precipitation. The trendline was fitted using simple linear regression. Grey shading represents the bounds of a 95% confidence interval.
@@ -368,6 +368,8 @@ ggplot(data = seattle_dry_days) +
 
 
 ### Statistical Testing
+
+**Table 2** shows the results of statistical testing performed on the climate extremes data. Slope and P value refer to the results of simple linear regression. M-K significance level refers to the results of Mann-Kendall test performed on each measure.
 
 ```{r}
 # linear regressions
@@ -420,6 +422,12 @@ kable(extremes_stats_table,
       digits = c(0, 4, 4, 4)) %>% 
   kable_minimal(full_width = FALSE)
 ```
+#### Conclusions
 
+-   **The number of hot days per year in Seattle is increasing**, and this trend was determined to be significant (p \< 0.01).
+-   **The number of days in Seattle where the minimum temperature drops below freezing is declining**, and this trend was determined to be significant (p \< 0.001).
+-   The number of extremely hot days is increasing, while extremely cold events are becoming less common.
+-   **There have been slight increases in the number of dry and wet days per year, but these trends are not significant.** This indicates that the occurrence of extreme precipitation events are not changing over time in a significant way in Seattle.
 
 ## Discussion
+
