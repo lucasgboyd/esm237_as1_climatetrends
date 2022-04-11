@@ -266,7 +266,7 @@ seattle_dry_days <- seattle_ts %>%
 
 ### Temperature Extremes
 
-```{r, include=false}
+```{r, include= FALSE}
 # plotting hottest day of the year 1949-2021
 ggplot(data = seattle_hottest_days) +
   geom_smooth(method = "lm", 
